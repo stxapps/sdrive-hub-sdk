@@ -1,0 +1,18 @@
+// Top-level build file where you can add configuration options common to all sub-projects/modules.
+
+buildscript {
+    ext {
+        khex_version = '1.0.0'
+        khash_version = '1.0.0-RC5'
+        kethereum_version = '0.83.0'
+        kbase58_version = '0.1'
+        kbip44_version = '0.1'
+    }
+}
+
+plugins {
+    alias(libs.plugins.android.application) apply false
+    alias(libs.plugins.kotlin.android) apply false
+    alias(libs.plugins.kotlin.serialization) apply false
+    alias(libs.plugins.android.library) apply false
+}
