@@ -1,18 +1,52 @@
 package org.blockstack.android.sdk.ecies
 
 import org.blockstack.android.sdk.model.SignatureObject
+import org.blockstack.android.sdk.model.SignedCipherObject
 import org.blockstack.android.sdk.toHexPublicKey64
+import org.bouncycastle.crypto.digests.SHA256Digest
+import org.bouncycastle.crypto.ec.CustomNamedCurves
+import org.bouncycastle.crypto.params.ECDomainParameters
+import org.bouncycastle.crypto.params.ECPublicKeyParameters
+import org.bouncycastle.crypto.signers.ECDSASigner
+import org.bouncycastle.crypto.signers.HMacDSAKCalculator
+import org.kethereum.crypto.decompressKey
 import org.kethereum.crypto.signMessageHash
 import org.kethereum.crypto.toECKeyPair
+import org.kethereum.extensions.toBigInteger
+import org.kethereum.extensions.toBytesPadded
+import org.kethereum.model.PRIVATE_KEY_SIZE
+import org.kethereum.model.PUBLIC_KEY_SIZE
+import org.kethereum.model.ECKeyPair
 import org.kethereum.model.PrivateKey
+import org.kethereum.model.PublicKey
 import org.kethereum.model.SignatureData
 import org.komputing.khash.sha256.extensions.sha256
+import org.komputing.khex.extensions.hexToByteArray
 import org.komputing.khex.extensions.toNoPrefixHexString
 import org.komputing.khex.model.HexString
+import java.math.BigInteger
+import java.security.InvalidParameterException
 import kotlin.experimental.and
 import kotlin.experimental.or
 import kotlin.math.ln
 import kotlin.math.log10
+
+/**
+ * The number of bytes needed to represent an uncompressed public key, including prefix.
+ * By default this is 65
+ */
+const val UNCOMPRESSED_PUBLIC_KEY_SIZE = PUBLIC_KEY_SIZE + 1
+
+/**
+ * The number of bytes needed to represent a compressed public key, including prefix.
+ * By default this is 33
+ */
+const val COMPRESSED_PUBLIC_KEY_SIZE = PRIVATE_KEY_SIZE + 1
+
+
+internal val CURVE by lazy { CustomNamedCurves.getByName("secp256k1")!! }
+internal val DOMAIN_PARAMS = CURVE.run { ECDomainParameters(curve, g, n, h) }
+
 
 fun signContent(content: Any, privateKey: String, toCanonical: Boolean = false): SignatureObject {
     val contentBuffer = if (content is ByteArray) {
@@ -27,10 +61,88 @@ fun signContent(content: Any, privateKey: String, toCanonical: Boolean = false):
     return SignatureObject(signatureString, keyPair.toHexPublicKey64())
 }
 
+fun signEncryptedContent(content: String, privateKey: String): SignedCipherObject {
+    val signatureObject = signContent(content, privateKey)
+    return SignedCipherObject(signatureObject.signature,
+            signatureObject.publicKey, content)
+}
+
+/**
+ * Returns the uncompressed version of this publicKey, including prefix
+ */
+fun PublicKey.getUncompressedPublicKeyWithPrefix(): ByteArray {
+    val pubBytes = this.normalize().key.toBytesPadded(UNCOMPRESSED_PUBLIC_KEY_SIZE)
+    pubBytes[0] = 0x04
+    return pubBytes
+}
+
+/**
+ * Transforms a PublicKey into its normalized version which is decompressed and has no prefix
+ */
+fun PublicKey.normalize(): PublicKey {
+    val pubBytes = this.key.toByteArray()
+    val normalizedBytes = when (pubBytes.size) {
+        UNCOMPRESSED_PUBLIC_KEY_SIZE -> pubBytes.copyOfRange(1, pubBytes.size)
+        COMPRESSED_PUBLIC_KEY_SIZE -> decompressKey(pubBytes)
+        else -> pubBytes
+    }
+    return PublicKey(normalizedBytes.toBigInteger())
+}
+fun ECKeyPair.verify(contentHash: ByteArray, signature: String): Boolean {
+    val sig: SignatureData = signature.fromDER()
+
+    val publicKeyBytes = publicKey.getUncompressedPublicKeyWithPrefix()
+
+    val ecPoint = CURVE.curve.decodePoint(publicKeyBytes)
+    val verifier = ECDSASigner(HMacDSAKCalculator(SHA256Digest()))
+
+    val ecPubKeyParams = ECPublicKeyParameters(ecPoint, DOMAIN_PARAMS)
+    verifier.init(false, ecPubKeyParams)
+
+    return verifier.verifySignature(contentHash, sig.r, sig.s)
+}
+
 data class Position(var place: Int)
+
+fun String.fromDER(): SignatureData {
+    val data = HexString(this).hexToByteArray()
+    val p = Position(0)
+    if (data[p.place++] != 0x30.toByte()) {
+        throw InvalidParameterException()
+    }
+    val len = getLength(data, p)
+    if ((len + p.place) != data.size) {
+        throw InvalidParameterException()
+    }
+    if (data[p.place++] != 0x02.toByte()) {
+        throw InvalidParameterException()
+    }
+    val rlen = getLength(data, p)
+    var r = data.sliceArray(p.place until rlen + p.place)
+    p.place += rlen
+    if (data[p.place++] != 0x02.toByte()) {
+        throw InvalidParameterException()
+    }
+    val slen = getLength(data, p)
+    if (data.size != slen + p.place) {
+        throw InvalidParameterException()
+    }
+    var s = data.sliceArray(p.place until slen + p.place)
+    /* BigInteger is dealing with leading zero correctly
+    if (r[0] == ZERO && (r[1] and LENGTH) != ZERO) {
+        r = r.sliceArray(1 until r.size)
+    }
+    if (s[0] == ZERO && (s[1] and LENGTH) != ZERO) {
+        s = s.sliceArray(1 until s.size)
+    }
+   */
+
+    return SignatureData(BigInteger(r), BigInteger(s), BigInteger.ZERO)
+}
 
 const val ZERO = 0.toByte()
 const val LENGTH = 0x80.toByte() // 128
+
 
 fun addSize(arr: MutableList<Byte>, len: Int) {
     if (len < 128) {

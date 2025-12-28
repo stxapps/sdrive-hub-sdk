@@ -27,6 +27,7 @@ import org.komputing.khex.extensions.toNoPrefixHexString
 import org.komputing.khex.model.HexString
 import java.security.KeyFactory
 import java.security.Security
+import java.security.interfaces.ECPrivateKey
 
 data class AuthScope(val scope: String, val domain: String) {
     companion object {
@@ -116,6 +117,16 @@ class Hub(val callFactory: Call.Factory = OkHttpClient()) {
         val privateKeySpec = ECPrivateKeySpec(privateKeyBI, paramSpec)
         val keyFactory = KeyFactory.getInstance("ECDSA", "BC")
         val privateKey = keyFactory.generatePrivate(privateKeySpec)
+
+        // For your peace of mind: deriving the public key from the java.security.PrivateKey object
+        // to prove it's the same key as the one used to generate `iss`.
+        val s = (privateKey as ECPrivateKey).s
+        val pubPoint = paramSpec.g.multiply(s)
+        val compressedPubKeyBytes = pubPoint.getEncoded(true)
+        val issFromJavaPrivateKey = compressedPubKeyBytes.toNoPrefixHexString()
+        Log.d(BlockstackSession.TAG, "iss from kethereum:      $iss")
+        Log.d(BlockstackSession.TAG, "iss from java private key: $issFromJavaPrivateKey, matches: ${iss == issFromJavaPrivateKey}")
+
         val signer = ECDSASigner(privateKey, Curve.SECP256K1)
         val signedJWT = SignedJWT(header, claimsSet)
         signedJWT.sign(signer)
