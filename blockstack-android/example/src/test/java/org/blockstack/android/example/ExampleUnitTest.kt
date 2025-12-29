@@ -1,4 +1,4 @@
-package org.blockstack.android.sdk
+package org.blockstack.android.example
 
 import org.junit.Test
 

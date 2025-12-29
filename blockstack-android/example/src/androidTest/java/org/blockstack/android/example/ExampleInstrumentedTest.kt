@@ -1,4 +1,4 @@
-package org.blockstack.android.sdk
+package org.blockstack.android.example
 
 import androidx.test.platform.app.InstrumentationRegistry
 import androidx.test.ext.junit.runners.AndroidJUnit4
