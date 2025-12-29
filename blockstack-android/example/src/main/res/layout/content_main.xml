@@ -12,15 +12,18 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="Sign in"
+        app:layout_constraintBottom_toTopOf="@+id/avatarView"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="parent" />
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_chainStyle="packed" />
 
     <ImageView
         android:id="@+id/avatarView"
         android:layout_width="24dp"
         android:layout_height="24dp"
         android:layout_margin="4dp"
+        app:layout_constraintBottom_toTopOf="@+id/userDataTextView"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/signInButton" />
@@ -29,6 +32,7 @@
         android:id="@+id/userDataTextView"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
+        app:layout_constraintBottom_toTopOf="@+id/signOutButton"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/avatarView" />
@@ -38,6 +42,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="Sign out"
+        app:layout_constraintBottom_toTopOf="@+id/putStringFileButton"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/userDataTextView" />
@@ -47,6 +52,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="Put String File"
+        app:layout_constraintBottom_toTopOf="@+id/readURLTextView"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/signOutButton" />
@@ -55,6 +61,7 @@
         android:id="@+id/readURLTextView"
         android:layout_width="match_parent"
         android:layout_height="37dp"
+        app:layout_constraintBottom_toTopOf="@+id/getStringFileButton"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/putStringFileButton" />
@@ -64,6 +71,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="Get String File"
+        app:layout_constraintBottom_toTopOf="@+id/fileContentsTextView"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/readURLTextView" />
@@ -72,6 +80,7 @@
         android:id="@+id/fileContentsTextView"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        app:layout_constraintBottom_toTopOf="@+id/deleteStringFileButton"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/getStringFileButton" />
@@ -81,6 +90,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="Delete String File"
+        app:layout_constraintBottom_toTopOf="@+id/deleteFileMessageTextView"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/fileContentsTextView" />
@@ -89,6 +99,7 @@
         android:id="@+id/deleteFileMessageTextView"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        app:layout_constraintBottom_toTopOf="@+id/putImageFileButton"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/deleteStringFileButton" />
@@ -98,6 +109,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="Put Image File"
+        app:layout_constraintBottom_toTopOf="@+id/imageFileTextView"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/deleteFileMessageTextView" />
@@ -106,6 +118,7 @@
         android:id="@+id/imageFileTextView"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        app:layout_constraintBottom_toTopOf="@+id/getImageFileButton"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/putImageFileButton" />
@@ -115,6 +128,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="Get Image File"
+        app:layout_constraintBottom_toTopOf="@+id/imageView"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/imageFileTextView" />
@@ -123,6 +137,7 @@
         android:id="@+id/imageView"
         android:layout_width="match_parent"
         android:layout_height="100dp"
+        app:layout_constraintBottom_toTopOf="@+id/deleteImageFileButton"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/getImageFileButton"
@@ -134,6 +149,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="Delete Image File"
+        app:layout_constraintBottom_toTopOf="@+id/performFilesButton"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/imageView" />
@@ -143,6 +159,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="Perform files"
+        app:layout_constraintBottom_toTopOf="@+id/listFilesButton"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/deleteImageFileButton" />
@@ -152,6 +169,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="List files"
+        app:layout_constraintBottom_toTopOf="@+id/listFilesText"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/performFilesButton" />
@@ -160,6 +178,7 @@
         android:id="@+id/listFilesText"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        app:layout_constraintBottom_toTopOf="@+id/putLocalFileButton"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/listFilesButton" />
@@ -169,6 +188,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="Put local file"
+        app:layout_constraintBottom_toTopOf="@+id/getLocalFileButton"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/listFilesText" />
@@ -178,6 +198,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="Get local file"
+        app:layout_constraintBottom_toTopOf="@+id/signECDSAButton"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/putLocalFileButton" />
@@ -187,6 +208,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="Sign ECDSA"
+        app:layout_constraintBottom_toTopOf="@+id/signECDSAText"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/getLocalFileButton" />
@@ -195,6 +217,7 @@
         android:id="@+id/signECDSAText"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/signECDSAButton" />

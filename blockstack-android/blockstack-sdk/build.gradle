@@ -47,6 +47,9 @@ dependencies {
     implementation "com.github.komputing.kethereum:crypto:$kethereum_version"
     implementation "com.github.komputing.kethereum:extensions_kotlin:$kethereum_version"
     implementation "com.github.komputing.kethereum:crypto_api:$kethereum_version"
+    implementation("com.github.komputing.kethereum:crypto_impl_bouncycastle:$kethereum_version") {
+        exclude group: 'org.bouncycastle', module: 'bcprov-jdk15on'
+    }
     implementation "com.github.komputing.khex:extensions:$khex_version"
     implementation "com.github.komputing:kbase58:$kbase58_version"
     implementation "com.github.komputing.khash:ripemd160:$khash_version"

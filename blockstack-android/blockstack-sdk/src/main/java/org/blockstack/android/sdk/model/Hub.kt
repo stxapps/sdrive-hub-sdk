@@ -9,15 +9,18 @@ import com.nimbusds.jwt.JWTClaimsSet
 import com.nimbusds.jwt.SignedJWT
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
-import okhttp3.*
+import okhttp3.Call
 import okhttp3.MediaType.Companion.toMediaType
+import okhttp3.OkHttpClient
+import okhttp3.Request
 import okhttp3.RequestBody.Companion.toRequestBody
+import okhttp3.Response
 import okio.ByteString
 import org.blockstack.android.sdk.BlockstackSession
 import org.blockstack.android.sdk.toBtcAddress
 import org.blockstack.android.sdk.toHexPublicKey64
-import org.bouncycastle.jce.provider.BouncyCastleProvider
 import org.bouncycastle.jce.ECNamedCurveTable
+import org.bouncycastle.jce.provider.BouncyCastleProvider
 import org.bouncycastle.jce.spec.ECPrivateKeySpec
 import org.json.JSONObject
 import org.kethereum.crypto.SecureRandomUtils
@@ -109,13 +112,11 @@ class Hub(val callFactory: Call.Factory = OkHttpClient()) {
         val claimsSet = claimsBuilder.build()
         Log.d(BlockstackSession.TAG, "$header, $claimsSet")
 
-        if (Security.getProvider(BouncyCastleProvider.PROVIDER_NAME) == null) {
-            Security.addProvider(BouncyCastleProvider())
-        }
         val privateKeyBI = kthPrivKey.key
         val paramSpec = ECNamedCurveTable.getParameterSpec("secp256k1")
         val privateKeySpec = ECPrivateKeySpec(privateKeyBI, paramSpec)
-        val keyFactory = KeyFactory.getInstance("ECDSA", "BC")
+        val bouncyCastleProvider = BouncyCastleProvider()
+        val keyFactory = KeyFactory.getInstance("EC", bouncyCastleProvider)
         val privateKey = keyFactory.generatePrivate(privateKeySpec)
 
         // For your peace of mind: deriving the public key from the java.security.PrivateKey object
@@ -128,6 +129,7 @@ class Hub(val callFactory: Call.Factory = OkHttpClient()) {
         Log.d(BlockstackSession.TAG, "iss from java private key: $issFromJavaPrivateKey, matches: ${iss == issFromJavaPrivateKey}")
 
         val signer = ECDSASigner(privateKey, Curve.SECP256K1)
+        signer.jcaContext.provider = bouncyCastleProvider
         val signedJWT = SignedJWT(header, claimsSet)
         signedJWT.sign(signer)
 
