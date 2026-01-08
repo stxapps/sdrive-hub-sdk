@@ -1,0 +1,11 @@
+* blockstack-react-native
+** steps
+- npx create-expo-module@latest react-native-blockstack
+- cd react-native-blockstack
+- npm run open:android
+- npx pod-install
+- npm run open:ios
+- cd example
+- npx expo start
+- 
+- 
