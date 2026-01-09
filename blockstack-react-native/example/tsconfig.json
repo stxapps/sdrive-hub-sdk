@@ -1,0 +1,10 @@
+{
+  "extends": "expo/tsconfig.base",
+  "compilerOptions": {
+    "strict": false,
+    "paths": {
+      "react-native-blockstack": ["../src/index"],
+      "react-native-blockstack/*": ["../src/*"]
+    }
+  }
+}
