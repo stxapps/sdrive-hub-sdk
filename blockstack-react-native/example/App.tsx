@@ -130,8 +130,12 @@ export default function App() {
 
     //const fname = 'message.txt';
     const options = { wasSigned: false };
+    try {
     const result = await RNBlockstackSdk.deleteFile(fname, options);
     console.log(JSON.stringify(result));
+    } catch (e) {
+      console.log('deleteFile error:', e);
+    }
     setState(prevState => ({ ...prevState, fileUrl: null, fileContents: null }));
   };
 
