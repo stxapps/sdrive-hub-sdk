@@ -22,6 +22,7 @@
     "RNBlockstackSDK"
   ],
   "license": "MIT",
+  "homepage": "https://github.com/stxapps/sdrive-hub-sdk",
   "dependencies": {},
   "devDependencies": {
     "@types/react": "~19.1.0",

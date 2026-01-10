@@ -39,49 +39,35 @@ export default function App() {
       console.log('reusing session');
     }
     setState(prevState => ({ ...prevState, loaded: true }));
-
-    const signedIn = await RNBlockstackSdk.isUserSignedIn();
-    if (signedIn['signedIn']) {
-      console.log('user is signed in');
-      const userData = await RNBlockstackSdk.loadUserData();
-      console.log('userData ' + JSON.stringify(userData));
-      setState(prevState => ({
-        ...prevState,
-        userData: { decentralizedID: getDecentralizedID(userData) },
-      }));
-    }
-  };
-
-  const signUp = async () => {
-    console.log('signUp');
-    try {
-
-
-      // If Android, app will be called with deep link and need to call handlePendingSignIn in useEffect -> initialUrl or Linking listener to url
-      //   The app will continue from there, not below.
-      // If iOS, handlePendingSignIn is called by blockstack-ios, no need to call manually. After completion, the app will continue below.
-      if (Platform.OS === 'ios') {
-        console.log('signUp successfully');
-        const userData = await RNBlockstackSdk.loadUserData();
-        console.log('userData ' + JSON.stringify(userData));
-        setState(prevState => ({
-          ...prevState,
-          userData: { decentralizedID: getDecentralizedID(userData) },
-        }));
-      }
-    } catch (error) {
-      // If user close the window, there will be an error:
-      //   The operation couldn’t be completed.
-      console.log(error)
-    }
   };
 
   const signIn = async () => {
     console.log('signIn');
     try {
+      const userData = {
+        "username": "",
+        "email": null,
+        "profile": {
+          "@type": "Person",
+          "@context": "http://schema.org",
+          "stxAddress": {}
+        },
+        "decentralizedID": "",
+        "identityAddress": "",
+        "appPrivateKey": "",
+        "coreSessionToken": null,
+        "authResponseToken": null,
+        "hubUrl": "",
+        "coreNode": null,
+        "gaiaAssociationToken": ""
+      };
 
-      if (Platform.OS === 'ios') {
-        console.log('signIn successfully');
+      const result = await RNBlockstackSdk.updateUserData(userData);
+      console.log(JSON.stringify(result));
+      console.log('signIn successfully');
+
+      const isUserSignedIn = await RNBlockstackSdk.isUserSignedIn();
+      if (isUserSignedIn) {
         const userData = await RNBlockstackSdk.loadUserData();
         console.log('userData ' + JSON.stringify(userData));
         setState(prevState => ({
@@ -166,62 +152,6 @@ export default function App() {
     console.log(JSON.stringify(result));
   };
 
-  const updateUserData = async () => {
-    /*const userData = {
-      "username": "",
-      "email": null,
-      "profile": {
-        "@type": "Person",
-        "@context": "http://schema.org",
-        "stxAddress": {}
-      },
-      "decentralizedID": "did:btc-addr:13YyiXjNC1sHTBP6YaTB6ew1FAiHpJE651",
-      "identityAddress": "13YyiXjNC1sHTBP6YaTB6ew1FAiHpJE651",
-      "appPrivateKey": "<value>",
-      "coreSessionToken": null,
-      "authResponseToken": null,
-      "hubUrl": "https://hub.blockstack.org",
-      "coreNode": null,
-      "gaiaAssociationToken": "<value>"
-    };*/
-    const userData = {
-      "username": "iiowmang.id.blockstack",
-      "email": null,
-      "profile": {
-        "@type": "Person",
-        "@context": "http://schema.org",
-        "image": [
-          {
-            "@type": "ImageObject",
-            "name": "avatar",
-            "contentUrl": "https://gaia.blockstack.org/hub/1Jkc9emzPhkGR1uG8s3Pe9CCPfWXL2UqCy//avatar-0"
-          }
-        ],
-        "stxAddress": {}
-      },
-      "decentralizedID": "did:btc-addr:1Jkc9emzPhkGR1uG8s3Pe9CCPfWXL2UqCy",
-      "identityAddress": "1Jkc9emzPhkGR1uG8s3Pe9CCPfWXL2UqCy",
-      "appPrivateKey": "<value>",
-      "coreSessionToken": null,
-      "authResponseToken": null,
-      "hubUrl": "https://hub.blockstack.org",
-      "coreNode": null,
-      "gaiaAssociationToken": "<value>"
-    };
-
-    const result = await RNBlockstackSdk.updateUserData(userData);
-    console.log(JSON.stringify(result));
-
-    const isUserSignedIn = await RNBlockstackSdk.isUserSignedIn();
-    if (isUserSignedIn) {
-      const userData = await RNBlockstackSdk.loadUserData();
-      setState(prevState => ({
-        ...prevState,
-        userData: { decentralizedID: getDecentralizedID(userData) },
-      }));
-    }
-  };
-
   const signECDSA = async () => {
     const privateKey = '';
     const content = 'Privacy Security UX';
@@ -233,7 +163,16 @@ export default function App() {
     const init = async () => {
       await createSession();
 
-
+      const signedIn = await RNBlockstackSdk.isUserSignedIn();
+      if (signedIn['signedIn']) {
+        console.log('user is signed in');
+        const userData = await RNBlockstackSdk.loadUserData();
+        console.log('userData ' + JSON.stringify(userData));
+        setState(prevState => ({
+          ...prevState,
+          userData: { decentralizedID: getDecentralizedID(userData) },
+        }));
+      }
     };
     init();
   }, []);
@@ -245,9 +184,6 @@ export default function App() {
   return (
     <View style={styles.container}>
       <Text style={styles.welcome}>Blockstack React Native Example</Text>
-      <TouchableOpacity onPress={() => signUp()} disabled={!state.loaded || state.userData != null} style={styles.button}>
-        <Text style={styles.buttonText}>Sign up</Text>
-      </TouchableOpacity>
       <TouchableOpacity onPress={() => signIn()} disabled={!state.loaded || state.userData != null} style={styles.button}>
         <Text style={styles.buttonText}>Sign In</Text>
       </TouchableOpacity>
@@ -274,9 +210,6 @@ export default function App() {
         <Text style={styles.buttonText}>List files</Text>
       </TouchableOpacity>
       <Text>------------</Text>
-      <TouchableOpacity onPress={() => updateUserData()} disabled={!state.loaded} style={styles.button}>
-        <Text style={styles.buttonText}>Update user data</Text>
-      </TouchableOpacity>
       <TouchableOpacity onPress={() => signECDSA()} disabled={!state.loaded} style={styles.button}>
         <Text style={styles.buttonText}>Sign ECDSA</Text>
       </TouchableOpacity>
