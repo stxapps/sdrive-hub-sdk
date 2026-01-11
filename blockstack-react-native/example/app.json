@@ -29,6 +29,7 @@
       "favicon": "./assets/favicon.png"
     },
     "plugins": [
+      "./plugins/blockstack-plugin.ts",
       [
         "expo-build-properties",
         {

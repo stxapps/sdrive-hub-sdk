@@ -41,7 +41,7 @@ class RNBlockstackSDKModule : Module() {
             mapOf("hasSession" to (session != null))
         }
 
-        AsyncFunction("createSession") { configArg: Map<String, Any> ->
+        AsyncFunction("createSession") { configArg: Map<String, Any?> ->
             val currentActivity = appContext.currentActivity
             if (currentActivity == null) {
                 throw IllegalStateException("must be called from an Activity")
@@ -82,7 +82,7 @@ class RNBlockstackSDKModule : Module() {
             mapOf("signedOut" to true)
         }
 
-        AsyncFunction("updateUserData") { userData: Map<String, Any>, promise: Promise ->
+        AsyncFunction("updateUserData") { userData: Map<String, Any?>, promise: Promise ->
             CoroutineScope(Dispatchers.IO).launch {
                 try {
                     if (session == null) {
@@ -106,7 +106,7 @@ class RNBlockstackSDKModule : Module() {
             jsonToMap(userData.json)
         }
 
-        AsyncFunction("putFile") { path: String, content: String, optionsArg: Map<String, Any>, promise: Promise ->
+        AsyncFunction("putFile") { path: String, content: String, optionsArg: Map<String, Any?>, promise: Promise ->
             CoroutineScope(Dispatchers.IO).launch {
                 try {
                     if (session == null) {
@@ -131,7 +131,7 @@ class RNBlockstackSDKModule : Module() {
             }
         }
 
-        AsyncFunction("getFile") { path: String, optionsArg: Map<String, Any>, promise: Promise ->
+        AsyncFunction("getFile") { path: String, optionsArg: Map<String, Any?>, promise: Promise ->
             CoroutineScope(Dispatchers.IO).launch {
                 try {
                     if (session == null) {
@@ -148,7 +148,7 @@ class RNBlockstackSDKModule : Module() {
                     if (res.hasValue) {
                         val result = mutableMapOf<String, Any>()
                         if (res.value is String) {
-                            result["fileContents"] = res.value as String
+                            result["fileContents"] = res.value
                         } else {
                             result["fileContentsEncoded"] = Base64.encodeToString(res.value as ByteArray, Base64.NO_WRAP)
                         }
@@ -162,7 +162,7 @@ class RNBlockstackSDKModule : Module() {
             }
         }
 
-        AsyncFunction("deleteFile") { path: String, optionsArg: Map<String, Any>, promise: Promise ->
+        AsyncFunction("deleteFile") { path: String, optionsArg: Map<String, Any?>, promise: Promise ->
             CoroutineScope(Dispatchers.IO).launch {
                 try {
                     if (session == null) {

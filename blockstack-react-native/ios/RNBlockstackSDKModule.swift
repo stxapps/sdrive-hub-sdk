@@ -3,7 +3,7 @@ import Blockstack
 
 public class RNBlockstackSDKModule: Module {
 
-    private var config: [String: Any]?
+    private var config: [String: Any?]?
 
     // Each module class must implement the definition function. The definition consists of components
     // that describes the module's functionality and behavior.
@@ -20,7 +20,7 @@ public class RNBlockstackSDKModule: Module {
             return ["hasSession": self.config != nil]
         }
 
-        AsyncFunction("createSession") { (config: [String: Any]?) in
+        AsyncFunction("createSession") { (config: [String: Any?]?) in
             self.config = config
 
             // blockstack-ios uses Google Promises that by default, resolve and reject are dispatched to run in main queue.
@@ -43,11 +43,24 @@ public class RNBlockstackSDKModule: Module {
             return ["signedOut": true]
         }
 
-        AsyncFunction("updateUserData") { (dict: [String: Any]) in
-            var mDict = dict
-            mDict["iss"] = dict["decentralizedID"]
-            mDict["private_key"] = dict["appPrivateKey"]
-            mDict["public_keys"] = [dict["identityAddress"]]
+        AsyncFunction("updateUserData") { (dict: [String: Any?]) in
+            var mDict: [String: Any] = dict.compactMapValues { $0 }
+
+            if let decentralizedID = dict["decentralizedID"] as? String {
+                mDict["iss"] = decentralizedID
+            } else {
+                mDict.removeValue(forKey: "iss")
+            }
+            if let appPrivateKey = dict["appPrivateKey"] as? String {
+                mDict["private_key"] = appPrivateKey
+            } else {
+                mDict.removeValue(forKey: "private_key")
+            }
+            if let identityAddress = dict["identityAddress"] as? String {
+                mDict["public_keys"] = [identityAddress]
+            } else {
+                mDict.removeValue(forKey: "public_keys")
+            }
 
             let jsonDecoder = JSONDecoder()
             let data = try JSONSerialization.data(withJSONObject: mDict)
@@ -64,7 +77,7 @@ public class RNBlockstackSDKModule: Module {
             return userData.dictionary ?? [:]
         }
 
-        AsyncFunction("putFile") { (fileName: String, content: String, options: [String: Any]?, promise: Promise) in
+        AsyncFunction("putFile") { (fileName: String, content: String, options: [String: Any?]?, promise: Promise) in
             let encrypt = options?["encrypt"] as? Bool ?? true
             let dir = options?["dir"] as? String ?? ""
 
@@ -83,7 +96,7 @@ public class RNBlockstackSDKModule: Module {
             }
         }
 
-        AsyncFunction("getFile") { (path: String, options: [String: Any]?, promise: Promise) in
+        AsyncFunction("getFile") { (path: String, options: [String: Any?]?, promise: Promise) in
             let decrypt = options?["decrypt"] as? Bool ?? true
             let dir = options?["dir"] as? String ?? ""
 
@@ -111,7 +124,7 @@ public class RNBlockstackSDKModule: Module {
             }
         }
 
-        AsyncFunction("deleteFile") { (path: String, options: [String: Any]?, promise: Promise) in
+        AsyncFunction("deleteFile") { (path: String, options: [String: Any?]?, promise: Promise) in
             let wasSigned = options?["wasSigned"] as? Bool ?? false
 
             Blockstack.shared.deleteFile(at: path, wasSigned: wasSigned) { error in
@@ -167,8 +180,8 @@ public class RNBlockstackSDKModule: Module {
 }
 
 extension Encodable {
-    var dictionary: [String: Any]? {
+    var dictionary: [String: Any?]? {
         guard let data = try? JSONEncoder().encode(self) else { return nil }
-        return (try? JSONSerialization.jsonObject(with: data, options: .allowFragments)).flatMap { $0 as? [String: Any] }
+        return (try? JSONSerialization.jsonObject(with: data, options: .allowFragments)).flatMap { $0 as? [String: Any?] }
     }
 }
